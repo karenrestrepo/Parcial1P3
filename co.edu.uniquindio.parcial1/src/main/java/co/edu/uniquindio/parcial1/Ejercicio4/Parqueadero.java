@@ -1,6 +1,12 @@
 package co.edu.uniquindio.parcial1.Ejercicio4;
 
 public class Parqueadero {
+    public static void main(String[] args) {
+        // Posición de la entrada (11, 0)
+        int[] entrada = {11, 0};
+        estacionarCarro(entrada, 1);
+    }
+
     static final int FILAS = 12;
     static final int COLUMNAS = 7;
 
@@ -24,12 +30,6 @@ public class Parqueadero {
     // Movimiento: derecha, abajo, arriba, izquierda
     static int[] dirFila = {0, 1, -1, 0};
     static int[] dirColumna = {1, 0, 0, -1};
-
-    public static void main(String[] args) {
-        // Posición de la entrada (11, 0)
-        int[] entrada = {11, 0};
-        estacionarCarro(entrada, 1);
-    }
 
     static void estacionarCarro(int[] entrada, int carro) {
         if (carro > 2) return;
