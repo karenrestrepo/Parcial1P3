@@ -21,25 +21,30 @@ public class Parqueadero {
 
     static boolean[][] visitado = new boolean[FILAS][COLUMNAS];
 
-    // Movimiento: derecha, izquierda, abajo, arriba
-    static int[] dirFila = {0, 0, 1, -1};
-    static int[] dirColumna = {1, -1, 0, 0};
+    // Movimiento: derecha, abajo, arriba, izquierda
+    static int[] dirFila = {0, 1, -1, 0};
+    static int[] dirColumna = {1, 0, 0, -1};
 
     public static void main(String[] args) {
         // Posición de la entrada (11, 0)
         int[] entrada = {11, 0};
+        estacionarCarro(entrada, 1);
+    }
 
-        for (int carro = 1; carro <= 2; carro++) {
-            System.out.println("Intentando parquear el carro " + carro + "...");
-            if (moverCarro(entrada[0], entrada[1])) {
-                System.out.println("Carro " + carro + " parqueado.");
-                imprimirParqueadero();
-                limpiarRuta();
-            } else {
-                System.out.println("No se pudo parquear el carro " + carro);
-                break;
-            }
+    static void estacionarCarro(int[] entrada, int carro) {
+        if (carro > 2) return;
+
+        System.out.println("Intentando parquear el carro " + carro + "...");
+        if (moverCarro(entrada[0], entrada[1])) {
+            System.out.println("Carro " + carro + " parqueado.");
+            imprimirParqueadero();
+            limpiarRuta();
+        } else {
+            System.out.println("No se pudo parquear el carro " + carro);
+            return;
         }
+
+        estacionarCarro(entrada, carro + 1);
     }
 
     // Backtracking para mover el carro y parquearlo en R1 o R2
@@ -62,16 +67,14 @@ public class Parqueadero {
 
         // Marcar como visitado y registrar la ruta
         visitado[filaActual][colActual] = true;
-        parqueadero[filaActual][colActual] = "-"; // Marcar la ruta
+        parqueadero[filaActual][colActual] = "+"; // Marcar la ruta
 
-        // Intentar mover en las cuatro direcciones
-        for (int i = 0; i < 4; i++) {
-            int nuevaFila = filaActual + dirFila[i];
-            int nuevaColumna = colActual + dirColumna[i];
-
-            if (moverCarro(nuevaFila, nuevaColumna)) {
-                return true;
-            }
+        // Intentar mover en las cuatro direcciones sin el ciclo for
+        if (moverCarro(filaActual + dirFila[0], colActual + dirColumna[0]) ||
+                moverCarro(filaActual + dirFila[1], colActual + dirColumna[1]) ||
+                moverCarro(filaActual + dirFila[2], colActual + dirColumna[2]) ||
+                moverCarro(filaActual + dirFila[3], colActual + dirColumna[3])) {
+            return true;
         }
 
         // Desmarcar si no se encuentra una ruta válida
@@ -79,6 +82,7 @@ public class Parqueadero {
         parqueadero[filaActual][colActual] = ""; // Limpiar el camino si no fue exitoso
         return false;
     }
+
 
     // Verificar si la celda es válida para moverse
     static boolean esValido(int fila, int columna) {
@@ -102,24 +106,42 @@ public class Parqueadero {
 
     // Limpiar la ruta después de parquear el carro
     static void limpiarRuta() {
-        for (int i = 0; i < FILAS; i++) {
-            for (int j = 0; j < COLUMNAS; j++) {
-                if (parqueadero[i][j].equals("-")) {
-                    parqueadero[i][j] = ""; // Limpiar la ruta recorrida
-                }
-                visitado[i][j] = false; // Reiniciar el estado de las celdas visitadas
-            }
+        limpiarRecursivo(0, 0);
+    }
+
+    static void limpiarRecursivo(int fila, int columna) {
+        if (fila >= FILAS) {
+            return;
         }
+        if (columna >= COLUMNAS) {
+            limpiarRecursivo(fila + 1, 0); // Cambiar de fila
+            return;
+        }
+
+        if (parqueadero[fila][columna].equals("+")) {
+            parqueadero[fila][columna] = ""; // Limpiar la ruta recorrida
+        }
+        visitado[fila][columna] = false; // Reiniciar el estado de las celdas visitadas
+
+        limpiarRecursivo(fila, columna + 1); // Pasar a la siguiente columna
     }
 
     // Imprimir el estado actual del parqueadero
     static void imprimirParqueadero() {
-        for (int i = 0; i < FILAS; i++) {
-            for (int j = 0; j < COLUMNAS; j++) {
-                System.out.print((parqueadero[i][j].isEmpty() ? " " : parqueadero[i][j]) + " ");
-            }
-            System.out.println();
+        imprimirRecursivo(0, 0);
+    }
+
+    static void imprimirRecursivo(int fila, int columna) {
+        if (fila >= FILAS) {
+            return;
         }
-        System.out.println();
+        if (columna >= COLUMNAS) {
+            System.out.println();
+            imprimirRecursivo(fila + 1, 0); // Cambiar de fila
+            return;
+        }
+
+        System.out.print((parqueadero[fila][columna].isEmpty() ? " " : parqueadero[fila][columna]) + " ");
+        imprimirRecursivo(fila, columna + 1); // Pasar a la siguiente columna
     }
 }
